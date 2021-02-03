@@ -12,9 +12,8 @@ import data, {dto} from './data/data';
 import AreaChart from './AreaChart';
 import {Button} from 'react-bootstrap';
 
-
 // Initialize some variables
-const stock = appleStock.slice(1000);
+let stock = appleStock.slice(1000);
 // let stock: Array<dto> = [{'close':0,'date':new Date().toISOString()}];
 // stock = data;
 const brushMargin = { top: 10, bottom: 15, left: 50, right: 20 };
@@ -38,8 +37,6 @@ const selectedBrushStyle = {
 const dd = {'close':0,'date':new Date().toISOString()};
 let getStockValue = (d: dto) => d.close;
 let getDate = (d: dto) => new Date(d.date);
-console.log("1", getStockValue);
-console.log("2", getDate);
 
 export type BrushProps = {
   width: number;
@@ -49,11 +46,12 @@ export type BrushProps = {
   compact?: boolean;
 };
 
+
 function BrushChart({
   compact = false,
   width,
   height,
-  test = [{'close':0,'date':new Date().toISOString()}],
+  test, //= [{'close':0,'date':new Date().toISOString()}],
   margin = {
     top: 20,
     left: 50,
@@ -61,22 +59,15 @@ function BrushChart({
     right: 20,
   },
 }: BrushProps) {
-  // console.log("init value : ", test);
+  
   // const getDate = (d: dto) => new Date(d.date);
   // const getStockValue = (d: dto) => d.time;
-  // stock = test;  
-  
-  // if(stock.length > 1){
-  //   getStockValue = (d: dto) => d.time;
-  //   getDate = (d: dto) => new Date(d.date);
-  // }
-  
-  // console.log("Example.tsx로 넘어온 stock 값 입니다!", stock);
+  if(test.length !== 0) {
+    stock = test;  
+  }
   const brushRef = useRef<BaseBrush | null>(null);
   const [filteredStock, setFilteredStock] = useState(stock);
   const [originStock, setOriginStock] = useState(stock);
-  // console.log("이게 있다고???", filteredStock);
-  
   
 
   const onBrushChange = (domain: Bounds | null) => {
@@ -88,8 +79,7 @@ function BrushChart({
       return x > x0 && x < x1 && y > y0 && y < y1;
     });
     setFilteredStock(stockCopy);
-    setOriginStock(stock);
-    
+    // setOriginStock(stock);    
   };
 
   const innerHeight = height - margin.top - margin.bottom;
@@ -125,23 +115,23 @@ function BrushChart({
     () =>
       scaleTime<number>({
         range: [0, xBrushMax],
-        domain: extent(stock, getDate) as [Date, Date],
-      }),
-    [xBrushMax],
+        domain: extent(originStock, getDate) as [Date, Date],
+      }),      
+    [xBrushMax, originStock],
   );
   const brushStockScale = useMemo(
     () =>
       scaleLinear({
         range: [yBrushMax, 0],
-        domain: [0, max(stock, getStockValue) || 0],
+        domain: [0, max(originStock, getStockValue) || 0],
         nice: true,
       }),
-    [yBrushMax],
+    [yBrushMax, originStock],
   );
 
   const initialBrushPosition = useMemo(
     () => ({
-      start: { x: brushDateScale(getDate(stock[stock.length-6])) },
+      start: { x: brushDateScale(getDate(stock[stock.length-3])) },
       end: { x: brushDateScale(getDate(stock[stock.length-1])) },
     }),
     [brushDateScale],
@@ -151,11 +141,14 @@ function BrushChart({
   const handleClearClick = () => {
     if (brushRef?.current) {
       setFilteredStock(stock);
+      setOriginStock(stock);
       brushRef.current.reset();
     }
   };
 
   const handleResetClick = () => {
+    setFilteredStock(stock);
+    setOriginStock(stock);
     if (brushRef?.current) {
       const updater: UpdateBrush = prevBrush => {
         const newExtent = brushRef.current!.getExtent(
@@ -194,7 +187,7 @@ function BrushChart({
         <AreaChart
           hideBottomAxis
           hideLeftAxis
-          data={stock}
+          data={originStock}
           width={width}
           yMax={yBrushMax}
           xScale={brushDateScale}
@@ -229,8 +222,8 @@ function BrushChart({
         </AreaChart>
       </svg>
       <div>
-        <Button onClick={handleClearClick}>Clear</Button>&nbsp;
-        <Button onClick={handleResetClick}>Reset</Button>
+        <Button onClick={handleClearClick}>데이터 불러오기</Button>&nbsp;
+        <Button onClick={handleResetClick}>최근 데이터 선택</Button>
       </div>
     </div>
   );

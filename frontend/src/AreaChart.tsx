@@ -59,8 +59,6 @@ export default function AreaChart({
   left?: number;
   children?: React.ReactNode;
 }) {
-  // const getDate = (d: dto) => new Date(d.date);
-  // const getStockValue = (d: dto) => d.time;
   if (width < 10) return null;
   return (
     <Group left={left || margin.left} top={top || margin.top}>

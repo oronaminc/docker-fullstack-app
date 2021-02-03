@@ -10,6 +10,9 @@ services:
       - /app/node_modules
       - ./frontend:/app
     stdin_open: true
+    depends_on:
+      mongo:
+        condition: service_healthy
 
   nginx: 
     restart: always
@@ -29,13 +32,14 @@ services:
       - /app/node_modules
       - ./backend:/app
     environment: 
-      MYSQL_HOST: mysql
-      MYSQL_USER: root 
-      MYSQL_ROOT_PASSWORD: johnahn
-      MYSQL_DATABASE: myapp
-      MYSQL_PORT: 3306
-    depends_on: 
-      - mongo
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME:-hmadmin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:-hmadminpass}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-owtdb}
+      MONGODB_USERNAME: ${MONGODB_USERNAME:-hmuser}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD:-hmpass}
+    depends_on:
+      mongo:
+        condition: service_healthy
 
   
   mongo:
@@ -45,4 +49,16 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./mongodb/data:/data/db
+      # - ./data/mongodb:/data/db
+      - ./data/log/mongodb:/var/log/mongodb
+      - ./mongodb/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
+    environment: 
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME:-hmadmin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:-hmadminpass}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-owtdb}
+      MONGODB_USERNAME: ${MONGODB_USERNAME:-hmuser}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD:-hmpass}
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/owtdb --quiet
+      timeout: 3s
+      retries: 10
