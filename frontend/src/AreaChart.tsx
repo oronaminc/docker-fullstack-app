@@ -4,8 +4,6 @@ import { AreaClosed } from '@visx/shape';
 import { AxisLeft, AxisBottom, AxisScale } from '@visx/axis';
 import { LinearGradient } from '@visx/gradient';
 import { curveMonotoneX } from '@visx/curve';
-import { AppleStock } from '@visx/mock-data/lib/mocks/appleStock';
-// import {dto} from './data/data';
 import {dto} from './dto';
 
 // Initialize some variables
@@ -26,8 +24,6 @@ const axisLeftTickLabelProps = {
 };
 
 //accessors
-// const getDate = (d: AppleStock) => new Date(d.date);
-// const getStockValue = (d: AppleStock) => d.close;
 const getStockValue = (d: dto) => d.close;
 const getDate = (d: dto) => new Date(d.date);
 
@@ -45,7 +41,6 @@ export default function AreaChart({
   left,
   children,
 }: {
-  // data: AppleStock[];
   data: dto[];
   gradientColor: string;
   xScale: AxisScale<number>;
@@ -69,7 +64,6 @@ export default function AreaChart({
         to={gradientColor}
         toOpacity={0.2}
       />
-      {/* <AreaClosed<AppleStock> */}
       <AreaClosed<dto>      
         data={data}
         x={d => xScale(getDate(d)) || 0}

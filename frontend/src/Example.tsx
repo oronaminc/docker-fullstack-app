@@ -1,28 +1,22 @@
 import React, { useRef, useState, useMemo } from 'react';
 import { scaleTime, scaleLinear } from '@visx/scale';
-import appleStock, { AppleStock } from '@visx/mock-data/lib/mocks/appleStock';
+import appleStock from '@visx/mock-data/lib/mocks/appleStock';
 import { Brush } from '@visx/brush';
 import { Bounds } from '@visx/brush/lib/types';
-import BaseBrush, { BaseBrushState, UpdateBrush } from '@visx/brush/lib/BaseBrush';
+import BaseBrush, {/*{ BaseBrushState, UpdateBrush }*/} from '@visx/brush/lib/BaseBrush';
 import { PatternLines } from '@visx/pattern';
 import { LinearGradient } from '@visx/gradient';
 import { max, extent } from 'd3-array';
-// import { dto } from './dto';
-import data, {dto} from './data/data';
+import {dto} from './data/data';
 import AreaChart from './AreaChart';
 import {Button} from 'react-bootstrap';
 
 // Initialize some variables
 let stock = appleStock.slice(1000);
-// let stock: Array<dto> = [{'close':0,'date':new Date().toISOString()}];
-// stock = data;
 const brushMargin = { top: 10, bottom: 15, left: 50, right: 20 };
 const chartSeparation = 30;
 const PATTERN_ID = 'brush_pattern';
 const GRADIENT_ID = 'brush_gradient';
-// export const accentColor = '#f6acc8';
-// export const background = '#584153';
-// export const background2 = '#af8baf';
 export const accentColor = '#004d7a';
 export const background = '#008793';
 export const background2 = '#A8EB12';
@@ -32,9 +26,7 @@ const selectedBrushStyle = {
 };
 
 // accessors
-// const getDate2 = (d: AppleStock) => new Date(d.date);
-// const getStockValue2 = (d: AppleStock) => d.close;
-const dd = {'close':0,'date':new Date().toISOString()};
+// const dd = {'close':0,'date':new Date().toISOString()};
 let getStockValue = (d: dto) => d.close;
 let getDate = (d: dto) => new Date(d.date);
 
@@ -79,7 +71,6 @@ function BrushChart({
       return x > x0 && x < x1 && y > y0 && y < y1;
     });
     setFilteredStock(stockCopy);
-    // setOriginStock(stock);    
   };
 
   const innerHeight = height - margin.top - margin.bottom;
@@ -146,28 +137,28 @@ function BrushChart({
     }
   };
 
-  const handleResetClick = () => {
-    setFilteredStock(stock);
-    setOriginStock(stock);
-    if (brushRef?.current) {
-      const updater: UpdateBrush = prevBrush => {
-        const newExtent = brushRef.current!.getExtent(
-          initialBrushPosition.start,
-          initialBrushPosition.end,
-        );
+  // const handleResetClick = () => {
+  //   setFilteredStock(stock);
+  //   setOriginStock(stock);
+  //   if (brushRef?.current) {
+  //     const updater: UpdateBrush = prevBrush => {
+  //       const newExtent = brushRef.current!.getExtent(
+  //         initialBrushPosition.start,
+  //         initialBrushPosition.end,
+  //       );
 
-        const newState: BaseBrushState = {
-          ...prevBrush,
-          start: { y: newExtent.y0, x: newExtent.x0 },
-          end: { y: newExtent.y1, x: newExtent.x1 },
-          extent: newExtent,
-        };
+  //       const newState: BaseBrushState = {
+  //         ...prevBrush,
+  //         start: { y: newExtent.y0, x: newExtent.x0 },
+  //         end: { y: newExtent.y1, x: newExtent.x1 },
+  //         extent: newExtent,
+  //       };
 
-        return newState;
-      };
-      brushRef.current.updateBrush(updater);
-    }
-  };
+  //       return newState;
+  //     };
+  //     brushRef.current.updateBrush(updater);
+  //   }
+  // };
 
   return (
     <div>
@@ -223,7 +214,7 @@ function BrushChart({
       </svg>
       <div>
         <Button onClick={handleClearClick}>데이터 불러오기</Button>&nbsp;
-        <Button onClick={handleResetClick}>최근 데이터 선택</Button>
+        {/* <Button onClick={handleResetClick}>최근 데이터 선택</Button> */}
       </div>
     </div>
   );
